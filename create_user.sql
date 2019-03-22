@@ -1,0 +1,19 @@
+CREATE ROLE "All" LOGIN
+  PASSWORD 'all'
+  SUPERUSER INHERIT CREATEDB CREATEROLE REPLICATION;
+GRANT user2readonly TO "All";
+GRANT userinsert TO "All";
+GRANT USAGE ON SCHEMA exos TO 'All';
+GRANT SELECT ON  ALL TABLES IN SCHEMA exos TO 'All';
+GRANT INSERT ON  ALL TABLES IN SCHEMA exos TO 'All';
+
+
+-----------------------------------
+
+CREATE ROLE postgres LOGIN
+  PASSWORD 'postgres'
+  SUPERUSER INHERIT CREATEDB CREATEROLE REPLICATION;
+GRANT "UserRO" TO postgres;
+GRANT user2readonly TO postgres;
+GRANT userinsert TO postgres;
+GRANT SELECT ON  ALL TABLES IN SCHEMA exos TO 'postgres';

@@ -1,0 +1,1 @@
+<a class="balise-a" href="../library/disconnect.php"><button class="button3">Disconnect</button></a>
