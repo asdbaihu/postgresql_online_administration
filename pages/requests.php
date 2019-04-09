@@ -3,8 +3,12 @@ session_start();
 if(!isset($_SESSION["username"]) && !isset($_SESSION["password"])) {
     header('Location: ../../index.php?error=2');
 }
-require "navbar.php";
-?> 
+
+//Get all member permissions
+require "../library/API/DatabaseAPI.php";
+$api = new DatabaseAPI();
+$schemaList = $api->selectSchemaList();
+?>
 <!DOCTYPE html>
 <html>
 
@@ -18,18 +22,40 @@ require "navbar.php";
 </head>
 
 <body>
-    <h1 class="login">Connected</h1>
-<div class="rect-button">
-    <?php if ($_SESSION["username"] == "postgres"): ?>
-        <a class="button2" href="selectAll.php"><button>Select All</button></a>
-    <?php elseif ($_SESSION["username"] == "All"): ?>
-        <a class="balise-a" href="all.php"><button class="button2">Insert</button></a>
-        <a class="balise-a" href="selectAll.php"><button class="button2">Select All</button></a>
-    <?php else: ?>
-        <p>Cet Utilisateur n'a aucune Permission</p>
-    <?php endif; ?>
+    <?php require "navbar.php"; ?>
+    <h1><?php echo "User : ".$_SESSION["username"] ?></h1>
+    <?php $superUser = $api->checkSuperUser();
+    if ($superUser): ?>
+    <div class="button-container">
+        <h2>Database administration</h2>
+        <a class="button-element" href="all.php"><button>Create User</button></a>
+        <a class="button-element" href="all.php"><button>Create Schema</button></a>
+    </div>
+    <?php endif;
 
-</div>
+    foreach ($schemaList as &$schema) {
+        $permission = $api->selectUserPermissions($schema->nspname); ?>
+        <div class="button-container">
+        <h2><?php echo "Schema : ".$schema->nspname; ?></h2>
+        <?php if ($permission->create): ?>
+            <a class="button-element" href="all.php"><button>Create new table</button></a>
+        <?php endif;
+        $tableList = $api->selectTableList($schema->nspname);
+        if ($tableList) {
+            foreach ($tableList as &$table) { ?>
+                <h3><?php echo "Table : ".$table->table_name; ?></h3><?php
+                if ($permission->use): ?>
+                    <a class="button-element" href="selectAll.php"><button>Select</button></a>
+                <?php endif; if ($permission->create): ?>
+                    <a class="button-element" href="all.php"><button>Insert</button></a>
+                    <a class="button-element" href="all.php"><button>Delete</button></a>
+                    <a class="button-element" href="all.php"><button>Manage Permissions</button></a>
+                <?php endif;
+            }
+        } ?>
+
+        </div><?php
+    } ?>
 </body>
 
 </html>

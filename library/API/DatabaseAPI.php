@@ -3,6 +3,65 @@
 
     class DatabaseAPI extends ConnectionAPI{
 
+        public function checkSuperUser() {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT user FROM pg_user WHERE usename ='".$_SESSION["username"]."' AND usesuper = TRUE";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
+        public function selectTableList($schema) {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT * FROM information_schema.tables WHERE table_schema = '".$schema."'";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            $tab=[];
+            while($result = $stmt->fetch(PDO::FETCH_OBJ)){
+                $tab[] = $result;
+            }         
+            $this->disconnectDB();
+            
+            $tab = count($tab) > 0 ? $tab : null; 
+            return $tab;
+        }
+
+        public function selectSchemaList() {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT nspname FROM pg_catalog.pg_namespace WHERE nspname !~ '^pg_' AND nspname <> 'information_schema' ";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            $tab=[];
+            while($result = $stmt->fetch(PDO::FETCH_OBJ)){
+                $tab[] = $result;
+            }         
+            $this->disconnectDB();
+            
+            $tab = count($tab) > 0 ? $tab : null; 
+            return $tab;
+        }
+
+        public function selectUserPermissions($schema) {
+            
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT
+                pg_catalog.has_schema_privilege('".$schema."', 'USAGE') AS use,
+                pg_catalog.has_schema_privilege('".$schema."', 'CREATE') AS create";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
         //Usage of pg_ functions
         public function insertMember($m_id, $m_surname, $m_firstname, $m_address, $m_zipcode, $m_phone) {
             
