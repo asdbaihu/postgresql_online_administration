@@ -3,6 +3,18 @@
 
     class DatabaseAPI extends ConnectionAPI{
 
+
+        // $query1 = "CREATE USER 'user1' WITH ENCRYPTED PASSWORD '".$2."'";
+        public function createUser() {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+            $sql="CREATE USER ".$_POST["user_name"]." WITH ENCRYPTED PASSWORD '".$_POST["user_password"]."';";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            //Close connection
+            pg_close($connect);
+        }
+
         public function checkSuperUser() {
             $this->connectDB($_SESSION["username"], $_SESSION["password"]);
        
@@ -11,6 +23,34 @@
             $stmt->execute();
 
             return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
+        public function selectUser($user) {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT * FROM pg_user WHERE usename ='".$user."'";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
+        public function selectUsers() {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT * FROM pg_user";
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            $tab=[];
+            while($result = $stmt->fetch(PDO::FETCH_OBJ)){
+                $tab[] = $result;
+            }         
+            $this->disconnectDB();
+            
+            $tab = count($tab) > 0 ? $tab : null; 
+            return $tab;
         }
 
         public function selectTableList($schema) {

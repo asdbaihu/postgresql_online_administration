@@ -20,5 +20,13 @@ elseif (isset($_POST["b_id"])) {
     header('Location: ../pages/requests.php');
 }
 
+elseif (isset($_POST["user_name"])) {
+    $create = new DatabaseAPI();
+    $create->createUser($_POST["user_name"], $_POST["user_password"]);
+    var_dump($create);
+    header('Location: ../pages/requests.php');
+}
 
+
+header('Location: ../pages/requests.php');
 ?>

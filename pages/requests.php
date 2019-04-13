@@ -28,7 +28,8 @@ $schemaList = $api->selectSchemaList();
     if ($superUser): ?>
     <div class="button-container">
         <h2>Database administration</h2>
-        <a class="button-element" href="all.php"><button>Create User</button></a>
+        <a class="button-element" href="createUser.php"><button>Create User</button></a>
+        <a class="button-element" href="selectUser.php"><button>Manage User Permissions</button></a>
         <a class="button-element" href="all.php"><button>Create Schema</button></a>
     </div>
     <?php endif;
