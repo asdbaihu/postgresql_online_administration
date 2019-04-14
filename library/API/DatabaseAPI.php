@@ -85,6 +85,31 @@
             }
         }
 
+        public function manageUserSchema($schema, $user, $use, $create) {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+
+            if ($use == 1) {
+                $sql = "GRANT USAGE ON SCHEMA ".$schema." TO ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "REVOKE USAGE ON SCHEMA ".$schema." FROM ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($create == 1) {
+                $sql = "GRANT CREATE ON SCHEMA ".$schema." TO ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "REVOKE CREATE ON SCHEMA ".$schema." FROM ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+        }
+
         public function selectUser($user) {
             $this->connectDB($_SESSION["username"], $_SESSION["password"]);
        
@@ -156,6 +181,19 @@
             $sql="SELECT
                 pg_catalog.has_schema_privilege('".$schema."', 'USAGE') AS use,
                 pg_catalog.has_schema_privilege('".$schema."', 'CREATE') AS create";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
+        public function selectSpeUserPermissions($user, $schema) {
+            
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT
+                pg_catalog.has_schema_privilege('".$user."','".$schema."', 'USAGE') AS use,
+                pg_catalog.has_schema_privilege('".$user."','".$schema."', 'CREATE') AS create";
             $stmt = $this->connection->prepare($sql);
             $stmt->execute();
 
