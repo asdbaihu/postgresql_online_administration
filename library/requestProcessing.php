@@ -31,4 +31,10 @@ elseif (isset($_POST["schema_manage"])) {
     $manage->manageUserSchema($_POST["schema_manage"], $_POST["user"], isset($_POST["use"]) + 0, isset($_POST["create"]) + 0);
     header('Location: ../pages/requests.php');
 }
+
+elseif (isset($_POST["table_manage"])) {
+    $manage = new DatabaseAPI();
+    $manage->manageUserTable($_POST["table_schema_manage"], $_POST["table_manage"], $_POST["user"], isset($_POST["select"]) + 0, isset($_POST["insert"]) + 0,  isset($_POST["update"]) + 0,  isset($_POST["delete"]) + 0);
+    header('Location: ../pages/requests.php');
+}
 ?>

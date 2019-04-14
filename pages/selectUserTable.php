@@ -24,13 +24,14 @@ $userList = $api->selectUsers();
     <?php require "navbar.php"; ?>
     <h1>Select user</h1>
 
-    <form class="form-request" id="createUser" action="manageUserSchema.php" method="POST">
+    <form class="form-request" id="createUser" action="manageUserTable.php" method="POST">
         <select class="input" name="user" id="user">
             <?php foreach ($userList as $user) { ?>
                 <option value="<?= $user->usename ?>"><?= $user->usename ?></option>
             <?php } ?>
         </select>
-        <input type="hidden" name="schema" id="schema" value="<?php echo $_POST["manageSchema"] ?>" />
+        <input type="hidden" name="schema" id="schema" value="<?php echo $_POST["schema"] ?>" />
+        <input type="hidden" name="table" id="table" value="<?php echo $_POST["table"] ?>" />
         <button type="submit">Select</button>
     </form>
 </body>

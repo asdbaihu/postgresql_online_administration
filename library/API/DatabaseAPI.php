@@ -110,6 +110,51 @@
             }
         }
 
+        public function manageUserTable($schema, $table, $user, $select, $insert, $update, $delete) {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+
+            if ($select == 1) {
+                $sql = "GRANT SELECT ON ".$schema.".".$table." TO ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "REVOKE SELECT ON ".$schema.".".$table." FROM ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($insert == 1) {
+                $sql = "GRANT INSERT ON ".$schema.".".$table." TO ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "REVOKE INSERT ON ".$schema.".".$table." FROM ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($update == 1) {
+                $sql = "GRANT UPDATE ON ".$schema.".".$table." TO ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "REVOKE UPDATE ON ".$schema.".".$table." FROM ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($delete == 1) {
+                $sql = "GRANT DELETE ON ".$schema.".".$table." TO ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "REVOKE DELETE ON ".$schema.".".$table." FROM ".$user.";";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+        }
+
         public function selectUser($user) {
             $this->connectDB($_SESSION["username"], $_SESSION["password"]);
        
@@ -194,6 +239,21 @@
             $sql="SELECT
                 pg_catalog.has_schema_privilege('".$user."','".$schema."', 'USAGE') AS use,
                 pg_catalog.has_schema_privilege('".$user."','".$schema."', 'CREATE') AS create";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
+        public function selectUserTablePermissions($user, $schema, $table) {
+            
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+       
+            $sql="SELECT
+                pg_catalog.has_table_privilege('".$user."','".$schema.".".$table."', 'SELECT') AS select,
+                pg_catalog.has_table_privilege('".$user."','".$schema.".".$table."', 'INSERT') AS insert,
+                pg_catalog.has_table_privilege('".$user."','".$schema.".".$table."', 'UPDATE') AS update,
+                pg_catalog.has_table_privilege('".$user."','".$schema.".".$table."', 'DELETE') AS delete";
             $stmt = $this->connection->prepare($sql);
             $stmt->execute();
 

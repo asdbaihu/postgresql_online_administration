@@ -21,19 +21,20 @@ $schemaList = $api->selectSchemaList();
 
 <body>
     <?php require "navbar.php"; ?>
-    <h1><?php echo "User : ".$_SESSION["username"] ?></h1>
+    <h1 style="margin-top:128px"><?php echo "User : ".$_SESSION["username"] ?></h1>
     <?php $superUser = $api->checkSuperUser();
     if ($superUser): ?>
     <div class="button-container">
         <h2>Database administration</h2>
         <a class="button-element" href="createUser.php"><button>Create User</button></a>
         <a class="button-element" href="createSchema.php"><button>Create Schema</button></a>
-        <a class="button-element" href="selectUser.php"><button>Manage Permissions</button></a>
+        <a class="button-element" href="selectUser.php"><button>Manage database Permissions</button></a>
     </div>
     <?php endif;
 
     foreach ($schemaList as &$schema) {
         $permission = $api->selectUserPermissions($schema->nspname); ?>
+        <hr style="width:50%;margin: 64px auto">
         <div class="button-container">
         <h2><?php echo "Schema : ".$schema->nspname; ?></h2>
         <?php if ($permission->create): ?>
@@ -43,12 +44,13 @@ $schemaList = $api->selectSchemaList();
             </form>
             <form style="margin:0 16px" action="selectUserSchema.php" method="POST">
                 <input type="hidden" name="manageSchema" id="manageSchema" value="<?php echo $schema->nspname ?>" />
-                <button type="submit">Manage Permissions</button>
+                <button type="submit">Manage schema Permissions</button>
             </form>
         <?php endif;
         $tableList = $api->selectTableList($schema->nspname);
         if ($tableList) {
             foreach ($tableList as &$table) { ?>
+                <div style="width:100%"><hr style="width:25%"></div>
                 <h3><?php echo "Table : ".$schema->nspname.".".$table->table_name; ?></h3><?php
                 if ($permission->use): ?>
                     <form style="margin:0 16px" action="select.php" method="POST">
@@ -59,7 +61,7 @@ $schemaList = $api->selectSchemaList();
                     <form style="margin:0 16px" action="selectUserTable.php" method="POST">
                         <input type="hidden" name="schema" id="schema" value="<?php echo $schema->nspname ?>" />
                         <input type="hidden" name="table" id="table" value="<?php echo $table->table_name ?>" />
-                        <button type="submit">Manage Permissions</button>
+                        <button type="submit">Manage table Permissions</button>
                     </form>
                 <?php endif;
             }
