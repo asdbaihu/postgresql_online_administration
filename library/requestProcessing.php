@@ -23,10 +23,18 @@ elseif (isset($_POST["b_id"])) {
 elseif (isset($_POST["user_name"])) {
     $create = new DatabaseAPI();
     $create->createUser($_POST["user_name"], $_POST["user_password"]);
-    var_dump($create);
     header('Location: ../pages/requests.php');
 }
 
+elseif (isset($_POST["schema_name"])) {
+    $create = new DatabaseAPI();
+    $create->createSchema($_POST["schema_name"]);
+    header('Location: ../pages/requests.php');
+}
 
-header('Location: ../pages/requests.php');
+elseif (isset($_POST["manage_user"])) {
+    $manage = new DatabaseAPI();
+    $manage->manageUser(isset($_POST["usecreatedb"]) + 0, isset($_POST["usesuper"]) + 0, isset($_POST["userepl"]) + 0, isset($_POST["usebypassrls"]) + 0, $_POST["manage_user"]);
+    header('Location: ../pages/requests.php');
+}
 ?>

@@ -26,17 +26,19 @@ $user = $api->selectUser($_POST["manage_user"]);
 
     <form class="form-request" id="createUser" action="../library/requestProcessing.php" method="POST">
         <div class="checkbox">
-            <input type="checkbox" name="usecreatedb" value="usecreatedb" <?php if ($user->usecreatedb == true) echo 'checked'; ?>> usecreatedb
+            <input type="checkbox" name="usecreatedb" value="usecreatedb" <?php if ($user->usecreatedb == true) echo 'checked'; ?>> User can create databases
         </div>
         <div class="checkbox">
-            <input type="checkbox" name="usesuper" value="usesuper" <?php if ($user->usesuper == true) echo 'checked'; ?>> usesuper
+            <input type="checkbox" name="usesuper" value="usesuper" <?php if ($user->usesuper == true) echo 'checked'; ?>> User is a superuser
         </div>
         <div class="checkbox">
-            <input type="checkbox" name="userepl" value="userepl" <?php if ($user->userepl == true) echo 'checked'; ?>> userepl
+            <input type="checkbox" name="userepl" value="userepl" <?php if ($user->userepl == true) echo 'checked'; ?>> User can put the system in and out of backup mode.
         </div>
         <div class="checkbox">
-            <input type="checkbox" name="usebypassrls" value="usebypassrls" <?php if ($user->usebypassrls == true) echo 'checked'; ?>> usebypassrls
+            <input type="checkbox" name="usebypassrls" value="usebypassrls" <?php if ($user->usebypassrls == true) echo 'checked'; ?>> User bypasses every row level security policy
         </div>
+        <input type="hidden" name="manage_user" id="manage_user" value="<?php echo $_POST['manage_user'] ?>" />
+
         <button type="submit">Update</button>
     </form>
 </body>

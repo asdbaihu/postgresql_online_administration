@@ -3,15 +3,21 @@
 
     class DatabaseAPI extends ConnectionAPI{
 
-
-        // $query1 = "CREATE USER 'user1' WITH ENCRYPTED PASSWORD '".$2."'";
         public function createUser() {
             $this->connectDB($_SESSION["username"], $_SESSION["password"]);
             $sql="CREATE USER ".$_POST["user_name"]." WITH ENCRYPTED PASSWORD '".$_POST["user_password"]."';";
             $stmt = $this->connection->prepare($sql);
             $stmt->execute();
 
-            //Close connection
+            pg_close($connect);
+        }
+
+        public function createSchema() {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+            $sql="CREATE SCHEMA IF NOT EXISTS ".$_POST["schema_name"].";";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
             pg_close($connect);
         }
 
@@ -23,6 +29,51 @@
             $stmt->execute();
 
             return $stmt->fetch(PDO::FETCH_OBJ);
+        }
+
+        public function manageUser($usecreatedb, $usesuper, $userepl, $usebypassrls, $user) {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+
+            if ($usecreatedb == 1) {
+                $sql = "ALTER ROLE ".$user." CREATEROLE CREATEDB;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "ALTER ROLE ".$user." CREATEROLE NOCREATEDB;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($usesuper == 1) {
+                $sql = "ALTER ROLE ".$user." WITH SUPERUSER;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "ALTER ROLE ".$user." WITH NOSUPERUSER;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($userepl == 1) {
+                $sql = "ALTER ROLE ".$user." WITH REPLICATION;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "ALTER ROLE ".$user." WITH NOREPLICATION;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            if ($usebypassrls == 1) {
+                $sql = "ALTER ROLE ".$user." WITH BYPASSRLS;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
+            else {
+                $sql = "ALTER ROLE ".$user." WITH NOBYPASSRLS;";
+                $stmt = $this->connection->prepare($sql);
+                $stmt->execute();
+            }
         }
 
         public function selectUser($user) {
@@ -102,122 +153,10 @@
             return $stmt->fetch(PDO::FETCH_OBJ);
         }
 
-        //Usage of pg_ functions
-        public function insertMember($m_id, $m_surname, $m_firstname, $m_address, $m_zipcode, $m_phone) {
-            
-            $username = $_SESSION["username"];
-            $password = $_SESSION["password"];
-            
-            //Initialize connection
-            $connect = pg_connect("host=localhost port=5432 dbname=test user=$username password=$password");        
-
-            // prepare sql and bind parameters
-            $stmt = pg_prepare($connect, "query", "INSERT INTO exos.members (memid, surname, firstname, address, zipcode, telephone,joindate) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)");
-
-            //Format date
-            $m_joindate = date('Y-m-d H:i:s');
-
-            //Execute sql query
-            $stmt = pg_execute($connect, "query", array($m_id, $m_surname, $m_firstname, $m_address, $m_zipcode, $m_phone, $m_joindate));
-
-            //Close connection
-            pg_close($connect);
-        }
-
-        //Usage of PDO
-        public function insertFacility($f_facid, $f_name, $f_membercost, $f_guestcost, $f_initialoutlay, $f_monthlymaintenance){
-            
-            $this->connectDB($_SESSION["username"], $_SESSION["password"]);  
-                  
-
-            // prepare sql and bind parameters
-            $stmt = $this->connection->prepare("INSERT INTO exos.facilities (facid, name, membercost, guestcost,initialoutlay, monthlymaintenance) 
-            VALUES (:f_facid, :f_name, :f_membercost, :f_guestcost,:f_initialoutlay, :f_monthlymaintenance)");
-            $stmt->bindParam(':f_facid', $f_facid);
-            $stmt->bindParam(':f_name', $f_name);
-            $stmt->bindParam(':f_membercost', $f_membercost);
-            $stmt->bindParam(':f_guestcost', $f_guestcost);
-            $stmt->bindParam(':f_initialoutlay', $f_initialoutlay);
-            $stmt->bindParam(':f_monthlymaintenance', $f_monthlymaintenance);
-
-
-            $stmt->execute();
-
-            $this->disconnectDB();
-        }
-
-        public function insertBooking($b_bookid, $b_facid, $b_memid, $b_starttime, $b_slots){
-            
-            $this->connectDB($_SESSION["username"], $_SESSION["password"]);         
-            
-
-                // prepare sql and bind parameters
-            $stmt = $this->connection->prepare("INSERT INTO exos.bookings (bookid, facid, memid, starttime, slots) 
-            VALUES (:b_bookid, :b_facid, :b_memid, :b_starttime, :b_slots)");
-            $stmt->bindParam(':b_bookid', $b_bookid);
-            $stmt->bindParam(':b_facid', $b_facid);
-            $stmt->bindParam(':b_memid', $b_memid);
-            $stmt->bindParam(':b_starttime', $b_starttime);
-            $stmt->bindParam(':b_slots', $b_slots);
-
-            $b_starttime = date('Y-m-d H:i:s', strtotime($b_starttime));
-
-            $stmt->execute();
-
-            $this->disconnectDB();
-        }
-
-        public function selectAllMembers() {
+        public function select($table) {
             $this->connectDB($_SESSION["username"], $_SESSION["password"]);
        
-            $sql="SELECT * FROM exos.members";
-
-            $stmt = $this->connection->prepare($sql);
-            $stmt->execute();
-
-            $tab=[];
-            while($result = $stmt->fetch(PDO::FETCH_OBJ)){
-                $tab[] = $result;
-            }         
-            $this->disconnectDB();
-            
-            $tab = count($tab) > 0 ? $tab : null; 
-            return $tab;
-        }
-
-        public function selectAllFacilities() {
-            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
-       
-            $sql="SELECT * FROM exos.facilities";
-
-            $stmt = $this->connection->prepare($sql);
-            $stmt->execute();
-
-            $tab=[];
-            while($result = $stmt->fetch(PDO::FETCH_OBJ)){
-                $tab[] = $result;
-            }         
-            $this->disconnectDB();
-            
-            $tab = count($tab) > 0 ? $tab : null; 
-            return $tab;
-        }
-
-        public function selectAllBookings() {
-            $this->connectDB("All", "all");
-       
-            $sql="SELECT 
-                        b.bookid,
-                        b.facid,
-                        f.name,
-                        b.memid,
-                        m.surname,
-                        m.firstname
-                    FROM
-                        exos.bookings b
-                    INNER JOIN exos.facilities f ON (b.facid = f.facid)
-                    INNER JOIN exos.members m ON (b.memid = m.memid) ";
+            $sql="SELECT * FROM ".$table;
 
             $stmt = $this->connection->prepare($sql);
             $stmt->execute();

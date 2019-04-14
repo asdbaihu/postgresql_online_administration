@@ -30,7 +30,7 @@ $schemaList = $api->selectSchemaList();
         <h2>Database administration</h2>
         <a class="button-element" href="createUser.php"><button>Create User</button></a>
         <a class="button-element" href="selectUser.php"><button>Manage User Permissions</button></a>
-        <a class="button-element" href="all.php"><button>Create Schema</button></a>
+        <a class="button-element" href="createSchema.php"><button>Create Schema</button></a>
     </div>
     <?php endif;
 
@@ -39,18 +39,19 @@ $schemaList = $api->selectSchemaList();
         <div class="button-container">
         <h2><?php echo "Schema : ".$schema->nspname; ?></h2>
         <?php if ($permission->create): ?>
-            <a class="button-element" href="all.php"><button>Create new table</button></a>
+            <a class="button-element" href=""><button>Create new table</button></a>
         <?php endif;
         $tableList = $api->selectTableList($schema->nspname);
         if ($tableList) {
             foreach ($tableList as &$table) { ?>
-                <h3><?php echo "Table : ".$table->table_name; ?></h3><?php
+                <h3><?php echo "Table : ".$schema->nspname.".".$table->table_name; ?></h3><?php
                 if ($permission->use): ?>
-                    <a class="button-element" href="selectAll.php"><button>Select</button></a>
+                    <form style="margin:0 16px" action="select.php" method="POST">
+                        <input type="hidden" name="table" id="table" value="<?php echo $schema->nspname.".".$table->table_name ?>" />
+                        <button type="submit">Select</button>
+                    </form>
                 <?php endif; if ($permission->create): ?>
-                    <a class="button-element" href="all.php"><button>Insert</button></a>
-                    <a class="button-element" href="all.php"><button>Delete</button></a>
-                    <a class="button-element" href="all.php"><button>Manage Permissions</button></a>
+                    <a class="button-element" href=""><button>Manage Permissions</button></a>
                 <?php endif;
             }
         } ?>
