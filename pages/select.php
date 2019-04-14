@@ -18,12 +18,12 @@ if(!isset($_SESSION["username"]) && !isset($_SESSION["password"])) {
 
 <body>
     <?php require "navbar.php"; ?>
-    <h1 class="login">Select <?php echo $_POST["table"] ?></h1>
+    <h1 class="login">Select <?php echo $_POST["selectTable"] ?></h1>
     <p style="color:#fff;margin:auto">
     <?php  
         require "../library/API/DatabaseAPI.php";
         $api = new DatabaseAPI();
-        $result = $api->select($_POST["table"]);
+        $result = $api->select($_POST["selectTable"]);
         
         function afficher_tableau($tableau) {
             foreach ($tableau as $cle=>$valeur) {
@@ -35,7 +35,7 @@ if(!isset($_SESSION["username"]) && !isset($_SESSION["password"])) {
                 }
             }
         }
-        afficher_tableau($result);
+        if ($result) afficher_tableau($result);
     ?>
     </p>
 </body>

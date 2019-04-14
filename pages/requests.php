@@ -39,7 +39,10 @@ $schemaList = $api->selectSchemaList();
         <div class="button-container">
         <h2><?php echo "Schema : ".$schema->nspname; ?></h2>
         <?php if ($permission->create): ?>
-            <a class="button-element" href=""><button>Create new table</button></a>
+            <form style="margin:0 16px" action="createTable.php" method="POST">
+                <input type="hidden" name="createTable" id="createTable" value="<?php echo $schema->nspname ?>" />
+                <button type="submit">Create new table</button>
+            </form>
         <?php endif;
         $tableList = $api->selectTableList($schema->nspname);
         if ($tableList) {
@@ -47,7 +50,7 @@ $schemaList = $api->selectSchemaList();
                 <h3><?php echo "Table : ".$schema->nspname.".".$table->table_name; ?></h3><?php
                 if ($permission->use): ?>
                     <form style="margin:0 16px" action="select.php" method="POST">
-                        <input type="hidden" name="table" id="table" value="<?php echo $schema->nspname.".".$table->table_name ?>" />
+                        <input type="hidden" name="selectTable" id="selectTable" value="<?php echo $schema->nspname.".".$table->table_name ?>" />
                         <button type="submit">Select</button>
                     </form>
                 <?php endif; if ($permission->create): ?>

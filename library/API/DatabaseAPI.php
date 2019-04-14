@@ -21,6 +21,15 @@
             pg_close($connect);
         }
 
+        public function createTable($schema, $table) {
+            $this->connectDB($_SESSION["username"], $_SESSION["password"]);
+            $sql="CREATE TABLE IF NOT EXISTS ".$schema.".".$table." (id SERIAL PRIMARY KEY);";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute();
+
+            pg_close($connect);
+        }
+
         public function checkSuperUser() {
             $this->connectDB($_SESSION["username"], $_SESSION["password"]);
        
